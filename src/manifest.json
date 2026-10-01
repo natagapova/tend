@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Tend",
+  "version": "0.1.0",
+  "description": "Groups your open tabs by topic and helps you decide which to keep or close.",
+  "permissions": ["tabs", "storage", "unlimitedStorage"],
+  "host_permissions": [
+    "https://huggingface.co/*",
+    "https://*.huggingface.co/*",
+    "https://*.hf.co/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Tend",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  },
+  "web_accessible_resources": []
+}

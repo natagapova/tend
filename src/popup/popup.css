@@ -1,0 +1,91 @@
+:root {
+  --bg: #ffffff;
+  --fg: #1f2328;
+  --muted: #656d76;
+  --line: #d8dee4;
+  --hover: #f3f5f7;
+  --keep: #1a7f37;
+  --close: #cf222e;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1c1e21;
+    --fg: #e6edf3;
+    --muted: #8d96a0;
+    --line: #30363d;
+    --hover: #262a2f;
+    --keep: #3fb950;
+    --close: #f85149;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  width: 420px;
+  max-height: 580px;
+  background: var(--bg);
+  color: var(--fg);
+  font: 13px/1.4 system-ui, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+h1 { margin: 0; font-size: 15px; }
+#summary, .count, .status { color: var(--muted); }
+.status { padding: 12px; margin: 0; }
+.status.error { color: var(--close); }
+
+.cluster { padding: 8px 0 4px; border-bottom: 1px solid var(--line); }
+.cluster h2 { margin: 0 12px 4px; font-size: 12px; font-weight: 600; }
+.cluster ul { list-style: none; margin: 0; padding: 0; }
+
+.tab {
+  display: grid;
+  grid-template-columns: 34px 1fr auto;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 12px;
+}
+.tab:hover { background: var(--hover); }
+.tab.kept .keep { background: var(--keep); color: var(--bg); border-color: var(--keep); }
+
+.score {
+  font-variant-numeric: tabular-nums;
+  font-size: 11px;
+  text-align: right;
+  color: var(--muted);
+}
+
+.title {
+  all: unset;
+  cursor: pointer;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.title:focus-visible { outline: 2px solid var(--muted); }
+
+.actions { display: flex; gap: 4px; }
+.actions button {
+  font: inherit;
+  font-size: 11px;
+  padding: 1px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--fg);
+  cursor: pointer;
+}
+.actions .keep:hover { border-color: var(--keep); color: var(--keep); }
+.actions .close:hover { border-color: var(--close); color: var(--close); }
+.actions button:disabled { opacity: 0.5; cursor: default; }

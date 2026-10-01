@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Tend</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Tend</h1>
+      <span id="summary"></span>
+    </header>
+    <main id="clusters">
+      <p class="status">Grouping tabs… (the first run downloads a ~23 MB model)</p>
+    </main>
+    <template id="cluster-tpl">
+      <section class="cluster">
+        <h2><span class="label"></span> <span class="count"></span></h2>
+        <ul></ul>
+      </section>
+    </template>
+    <template id="tab-tpl">
+      <li class="tab">
+        <span class="score"></span>
+        <button class="title" type="button"></button>
+        <span class="actions">
+          <button class="keep" type="button">keep</button>
+          <button class="close" type="button">close</button>
+        </span>
+      </li>
+    </template>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
