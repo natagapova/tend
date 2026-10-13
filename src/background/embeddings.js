@@ -48,6 +48,13 @@ function hash(text) {
 
 const round = (x) => Math.round(x * 1e5) / 1e5;
 
+/** Unit-length embeddings for arbitrary strings (not cached — callers cache if needed). */
+export async function embedTexts(texts) {
+  const extractor = await getExtractor();
+  const output = await extractor(texts, { pooling: 'mean', normalize: true });
+  return output.tolist().map((vec) => vec.map(round));
+}
+
 /**
  * Returns a Map of tabId -> unit-length embedding for the given tabs,
  * computing any that are missing. With `prune`, cache entries for any tab not
@@ -60,13 +67,8 @@ export async function embedTabs(tabs, { prune = false } = {}) {
 
   let fresh = {};
   if (missing.length) {
-    const extractor = await getExtractor();
-    const output = await extractor(
-      missing.map(({ tab }) => tabText(tab)),
-      { pooling: 'mean', normalize: true },
-    );
-    const vectors = output.tolist();
-    missing.forEach(({ key }, i) => (fresh[key] = vectors[i].map(round)));
+    const vectors = await embedTexts(missing.map(({ tab }) => tabText(tab)));
+    missing.forEach(({ key }, i) => (fresh[key] = vectors[i]));
   }
 
   const liveKeys = new Set(keyed.map(({ key }) => key));

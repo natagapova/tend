@@ -57,11 +57,10 @@ const STOPWORDS = new Set(
 );
 
 /**
- * A short human label. For a multi-tab group: words shared by several
- * titles. For any group (including a singleton) where that yields nothing:
- * the most prominent words in the title(s), so a lone tab still gets
- * something readable like "vk id" instead of "id.vk.ru". Only falls back to
- * the hostname when the title has no usable words at all.
+ * A short human label for a cluster of tabs with no shared category (see
+ * categories.js, which groups categorized tabs directly): words shared by
+ * several titles, or the most prominent words in a singleton's title, or the
+ * common host as a last resort.
  */
 export function labelFor(tabs) {
   const counts = new Map();
