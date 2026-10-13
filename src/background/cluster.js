@@ -5,7 +5,10 @@
 // O(n^3) in the worst case, which is fine for the few hundred tabs a person
 // realistically has open.
 
-export const THRESHOLD = 0.45;
+// Title+hostname embeddings are a shallow signal, so a strict threshold left
+// almost every tab in its own singleton group. 0.3 merges more readily; tune
+// further once you've seen it against a realistic set of open tabs.
+export const THRESHOLD = 0.3;
 
 // Embeddings are already L2-normalized, so the dot product is cosine similarity.
 function dot(a, b) {
@@ -53,21 +56,31 @@ const STOPWORDS = new Set(
   'the a an and or of to in on for with at by from is are be how what your you my new tab page home www com org net html'.split(' '),
 );
 
-/** A short human label: words shared by several titles, else the common host. */
+/**
+ * A short human label. For a multi-tab group: words shared by several
+ * titles. For any group (including a singleton) where that yields nothing:
+ * the most prominent words in the title(s), so a lone tab still gets
+ * something readable like "vk id" instead of "id.vk.ru". Only falls back to
+ * the hostname when the title has no usable words at all.
+ */
 export function labelFor(tabs) {
-  if (tabs.length > 1) {
-    const counts = new Map();
-    for (const tab of tabs) {
-      const words = new Set(tab.title.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? []);
-      for (const w of words) if (!STOPWORDS.has(w)) counts.set(w, (counts.get(w) ?? 0) + 1);
+  const counts = new Map();
+  const order = [];
+  for (const tab of tabs) {
+    const words = tab.title.toLowerCase().match(/[\p{L}\p{N}]{3,}/gu) ?? [];
+    for (const w of new Set(words)) {
+      if (STOPWORDS.has(w)) continue;
+      if (!counts.has(w)) order.push(w);
+      counts.set(w, (counts.get(w) ?? 0) + 1);
     }
-    const shared = [...counts]
-      .filter(([, c]) => c >= 2)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([w]) => w);
-    if (shared.length) return shared.join(' · ');
   }
+  const minCount = tabs.length > 1 ? 2 : 1;
+  const ranked = order
+    .filter((w) => counts.get(w) >= minCount)
+    .sort((a, b) => counts.get(b) - counts.get(a))
+    .slice(0, 3);
+  if (ranked.length) return ranked.join(' · ');
+
   const hosts = tabs.map((t) => {
     try { return new URL(t.url).hostname.replace(/^www\./, ''); } catch { return ''; }
   });
