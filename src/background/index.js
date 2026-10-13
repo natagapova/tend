@@ -64,9 +64,18 @@ const handlers = {
     });
   },
 
-  /** msg: { tabId, action: 'keep' | 'close', clusterLabel, clusterSize } */
+  /**
+   * msg: { tabId, action: 'close', clusterLabel, clusterSize }
+   *
+   * The popup only offers "close" (no "keep") — leaving a tab open already
+   * means keeping it, so a separate click added nothing but asked the user
+   * for dead-end confirmation. Each close is still logged as a negative
+   * signal: a future feature (e.g. recommending sites, or personalizing
+   * relevance/clustering) could train on what people get rid of, by cluster
+   * and by how stale the tab was. Nothing reads this log yet.
+   */
   async decide({ tabId, action, clusterLabel, clusterSize }) {
-    if (action !== 'keep' && action !== 'close') throw new Error(`Unknown action: ${action}`);
+    if (action !== 'close') throw new Error(`Unknown action: ${action}`);
     const tab = (await read(KEYS.tabs, {}))[tabId];
     if (!tab) throw new Error('Tab is no longer open');
 
@@ -87,7 +96,7 @@ const handlers = {
     };
     await mutate(KEYS.decisions, [], (log) => [...log, record]);
 
-    if (action === 'close') await chrome.tabs.remove(tabId);
+    await chrome.tabs.remove(tabId);
     return record;
   },
 };

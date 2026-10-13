@@ -1,23 +1,31 @@
 :root {
-  --bg: #ffffff;
+  --bg: #f5f6f8;
+  --card: #ffffff;
   --fg: #1f2328;
-  --muted: #656d76;
-  --line: #d8dee4;
-  --hover: #f3f5f7;
-  --keep: #1a7f37;
+  --muted: #70787e;
+  --faint: #9aa1a7;
+  --line: #e4e7eb;
+  --accent: #6e56cf;
+  --accent-track: #e7e2f7;
   --close: #cf222e;
+  --close-hover-bg: #fdecec;
+  --shadow: 0 1px 2px rgba(16, 20, 24, 0.06), 0 1px 1px rgba(16, 20, 24, 0.04);
   color-scheme: light dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #1c1e21;
-    --fg: #e6edf3;
-    --muted: #8d96a0;
-    --line: #30363d;
-    --hover: #262a2f;
-    --keep: #3fb950;
-    --close: #f85149;
+:root:not([data-theme="light"]) {
+  @media (prefers-color-scheme: dark) {
+    --bg: #0f1012;
+    --card: #1a1b1e;
+    --fg: #ededf0;
+    --muted: #9a9ea5;
+    --faint: #6a6e75;
+    --line: #2a2c30;
+    --accent: #a48fff;
+    --accent-track: #2c2740;
+    --close: #ff6b6b;
+    --close-hover-bg: #3a1f22;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.25);
   }
 }
 
@@ -27,65 +35,140 @@ body {
   margin: 0;
   width: 420px;
   max-height: 580px;
+  overflow-y: auto;
   background: var(--bg);
   color: var(--fg);
-  font: 13px/1.4 system-ui, sans-serif;
+  font: 13px/1.4 -apple-system, "Segoe UI", system-ui, sans-serif;
 }
 
 header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
+  padding: 14px 16px 10px;
+  background: var(--bg);
 }
 
-h1 { margin: 0; font-size: 15px; }
-#summary, .count, .status { color: var(--muted); }
-.status { padding: 12px; margin: 0; }
+h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+#summary { font-size: 11px; color: var(--faint); }
+
+main { padding: 0 10px 12px; }
+
+.status { padding: 24px 16px; margin: 0; color: var(--muted); text-align: center; }
 .status.error { color: var(--close); }
 
-.cluster { padding: 8px 0 4px; border-bottom: 1px solid var(--line); }
-.cluster h2 { margin: 0 12px 4px; font-size: 12px; font-weight: 600; }
-.cluster ul { list-style: none; margin: 0; padding: 0; }
+.cluster {
+  background: var(--card);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.cluster h2 {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  margin: 0;
+  padding: 10px 12px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+.cluster .count { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--faint); }
+.cluster ul { list-style: none; margin: 0; padding: 0 4px 4px; }
 
 .tab {
   display: grid;
-  grid-template-columns: 34px 1fr auto;
+  grid-template-columns: 20px 1fr 36px auto;
   align-items: center;
-  gap: 6px;
-  padding: 3px 12px;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  transition: opacity 180ms ease, max-height 180ms ease, padding 180ms ease, margin 180ms ease;
 }
-.tab:hover { background: var(--hover); }
-.tab.kept .keep { background: var(--keep); color: var(--bg); border-color: var(--keep); }
+.tab:hover { background: var(--bg); }
 
-.score {
-  font-variant-numeric: tabular-nums;
-  font-size: 11px;
-  text-align: right;
-  color: var(--muted);
+.tab.closing {
+  opacity: 0;
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+.favicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
 }
 
 .title {
   all: unset;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   cursor: pointer;
+}
+.title-text {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+  font-size: 13px;
 }
-.title:focus-visible { outline: 2px solid var(--muted); }
-
-.actions { display: flex; gap: 4px; }
-.actions button {
-  font: inherit;
+.host {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   font-size: 11px;
-  padding: 1px 7px;
-  border-radius: 4px;
-  border: 1px solid var(--line);
-  background: transparent;
-  color: var(--fg);
+  color: var(--faint);
+}
+.title:focus-visible { outline: 2px solid var(--accent); border-radius: 4px; }
+
+/* Relevance as a small vertical track that fills from the bottom, like a
+   tiny level meter, rather than a bare decimal. */
+.score {
+  display: block;
+  width: 4px;
+  height: 20px;
+  border-radius: 2px;
+  background: var(--accent-track);
+  align-self: center;
+  justify-self: center;
+  position: relative;
+}
+.score-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%; /* set inline per-tab from popup.js */
+  background: var(--accent);
+  border-radius: 2px;
+  transition: height 200ms ease;
+}
+
+.close {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  color: var(--faint);
   cursor: pointer;
 }
-.actions .keep:hover { border-color: var(--keep); color: var(--keep); }
-.actions .close:hover { border-color: var(--close); color: var(--close); }
-.actions button:disabled { opacity: 0.5; cursor: default; }
+.close:hover { background: var(--close-hover-bg); color: var(--close); }
+.close:focus-visible { outline: 2px solid var(--accent); }
+.close:disabled { opacity: 0.4; cursor: default; }

@@ -20,40 +20,56 @@ function showStatus(text, isError = false) {
   root.append(p);
 }
 
+// Chrome's built-in favicon service (`favicon` permission) — avoids needing
+// host permissions for every site and works even for favicon-less pages.
+function faviconUrl(pageUrl, size = 32) {
+  const u = new URL(chrome.runtime.getURL('/_favicon/'));
+  u.searchParams.set('pageUrl', pageUrl);
+  u.searchParams.set('size', String(size));
+  return u.toString();
+}
+
+function hostOf(url) {
+  try { return new URL(url).hostname.replace(/^www\./, ''); } catch { return ''; }
+}
+
 function renderTab(tab, clusterInfo) {
   const li = tabTpl.content.firstElementChild.cloneNode(true);
-  const score = li.querySelector('.score');
+  const favicon = li.querySelector('.favicon');
   const title = li.querySelector('.title');
-  const keep = li.querySelector('.keep');
+  const titleText = li.querySelector('.title-text');
+  const host = li.querySelector('.host');
+  const score = li.querySelector('.score');
+  const scoreFill = li.querySelector('.score-fill');
   const close = li.querySelector('.close');
 
-  score.textContent = tab.relevance.toFixed(2);
-  score.title = `Last focused ${new Date(tab.lastFocusedAt).toLocaleString()}`;
-  title.textContent = tab.title || tab.url;
+  favicon.src = faviconUrl(tab.url);
+  titleText.textContent = tab.title || tab.url;
+  host.textContent = hostOf(tab.url);
   title.title = tab.url;
   title.addEventListener('click', () => {
     chrome.tabs.update(tab.id, { active: true });
     chrome.windows.update(tab.windowId, { focused: true });
   });
 
-  const decide = async (action) => {
-    keep.disabled = close.disabled = true;
+  scoreFill.style.height = `${Math.round(tab.relevance * 100)}%`;
+  score.title = `Relevance ${tab.relevance.toFixed(2)} · last focused ${new Date(tab.lastFocusedAt).toLocaleString()}`;
+
+  close.addEventListener('click', async () => {
+    close.disabled = true;
     try {
-      await send({ type: 'decide', tabId: tab.id, action, ...clusterInfo });
-      if (action === 'close') {
-        const section = li.closest('.cluster');
+      await send({ type: 'decide', tabId: tab.id, action: 'close', ...clusterInfo });
+      const section = li.closest('.cluster');
+      li.classList.add('closing');
+      li.addEventListener('transitionend', () => {
         li.remove();
         updateCount(section);
-      } else {
-        li.classList.add('kept');
-      }
+      }, { once: true });
     } catch (err) {
-      keep.disabled = close.disabled = false;
+      close.disabled = false;
       summary.textContent = err.message;
     }
-  };
-  keep.addEventListener('click', () => decide('keep'));
-  close.addEventListener('click', () => decide('close'));
+  });
   return li;
 }
 

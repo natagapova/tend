@@ -2,6 +2,10 @@
 //
 // TabRecord: { id, windowId, url, title, openedAt, lastFocusedAt, active }
 //
+// Favicons are looked up at render time via chrome://_favicon (see popup.js),
+// not stored here — that avoids needing host permissions for every site's
+// favicon URL and sidesteps stale/missing favIconUrl values.
+//
 // `lastFocusedAt` is stamped both when a tab gains focus and when it loses it,
 // so a tab you read for an hour and then left reports the time you left it.
 
