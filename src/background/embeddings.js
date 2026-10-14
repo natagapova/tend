@@ -33,7 +33,11 @@ export function tabText(tab) {
     const u = new URL(tab.url);
     url = u.hostname + u.pathname; // query strings and fragments are mostly noise
   } catch {}
-  return `${tab.title} ${url}`.slice(0, 512);
+  // The meta description (from content.js) often says what a page is
+  // *for* when the title doesn't — e.g. a font foundry simply named
+  // "Free Faces" says nothing about fonts, but its description does.
+  const text = tab.description ? `${tab.title} ${url} ${tab.description}` : `${tab.title} ${url}`;
+  return text.slice(0, 512);
 }
 
 // FNV-1a; only needs to be stable and cheap, not cryptographic.

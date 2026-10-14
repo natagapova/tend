@@ -1,10 +1,41 @@
 // Tabs within a cluster are listed stalest first, since those are the ones
 // worth deciding about. Relevance scores come from the background worker.
 
+import { KEYS } from '../background/store.js';
+
 const root = document.getElementById('clusters');
 const summary = document.getElementById('summary');
 const clusterTpl = document.getElementById('cluster-tpl');
 const tabTpl = document.getElementById('tab-tpl');
+
+// --- AI grouping settings (Anthropic API key) ---
+
+const settingsToggle = document.getElementById('settings-toggle');
+const settingsPanel = document.getElementById('settings-panel');
+const apiKeyInput = document.getElementById('api-key-input');
+const apiKeySave = document.getElementById('api-key-save');
+const settingsStatus = document.getElementById('settings-status');
+
+settingsToggle.addEventListener('click', () => {
+  settingsPanel.hidden = !settingsPanel.hidden;
+});
+
+chrome.storage.local.get(KEYS.anthropicApiKey).then((result) => {
+  if (result[KEYS.anthropicApiKey]) {
+    apiKeyInput.placeholder = '•••• saved ••••';
+    settingsStatus.textContent = 'AI grouping is on.';
+  }
+});
+
+apiKeySave.addEventListener('click', async () => {
+  const value = apiKeyInput.value.trim();
+  await chrome.storage.local.set({ [KEYS.anthropicApiKey]: value });
+  apiKeyInput.value = '';
+  apiKeyInput.placeholder = value ? '•••• saved ••••' : 'sk-ant-…';
+  settingsStatus.textContent = value
+    ? 'Saved. Reopen this popup to regroup with AI.'
+    : 'Cleared — back to local-only grouping.';
+});
 
 async function send(msg) {
   const res = await chrome.runtime.sendMessage(msg);

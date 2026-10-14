@@ -19,23 +19,20 @@ await Promise.all([
     .map((f) => cp(`${ortDist}/${f}`, `${outdir}/wasm/${f}`)),
 ]);
 
-const options = {
-  entryPoints: {
-    background: 'src/background/index.js',
-    popup: 'src/popup/popup.js',
-  },
-  outdir,
-  bundle: true,
-  format: 'esm',
-  platform: 'browser',
-  target: 'chrome116',
-  sourcemap: true,
-  logLevel: 'info',
-};
+const shared = { outdir, bundle: true, platform: 'browser', target: 'chrome116', sourcemap: true, logLevel: 'info' };
+
+// background.js (an MV3 module service worker) and popup.js (loaded via
+// <script type="module">) are ES modules; content.js is a classic content
+// script (manifest content_scripts don't support `type: "module"`), so it
+// needs its own build in a format a plain <script> can run.
+const builds = [
+  { ...shared, format: 'esm', entryPoints: { background: 'src/background/index.js', popup: 'src/popup/popup.js' } },
+  { ...shared, format: 'iife', entryPoints: { content: 'src/content/index.js' } },
+];
 
 if (watch) {
-  const ctx = await esbuild.context(options);
-  await ctx.watch();
+  const ctxs = await Promise.all(builds.map((o) => esbuild.context(o)));
+  await Promise.all(ctxs.map((ctx) => ctx.watch()));
 } else {
-  await esbuild.build(options);
+  await Promise.all(builds.map((o) => esbuild.build(o)));
 }
