@@ -6,9 +6,11 @@
 // queued on a single promise chain.
 
 export const KEYS = {
-  tabs: 'tabs',             // { [tabId]: TabRecord }
-  embeddings: 'embeddings', // { [textHash]: number[] }
-  decisions: 'decisions',   // DecisionRecord[]
+  tabs: 'tabs',                 // { [tabId]: TabRecord }
+  embeddings: 'embeddings',     // { [textHash]: number[] }
+  decisions: 'decisions',       // DecisionRecord[]
+  descriptions: 'descriptions', // { [tabId]: string } — from content.js, cleared on navigation
+  anthropicApiKey: 'anthropicApiKey', // string, set by the user in the popup
 };
 
 let queue = Promise.resolve();

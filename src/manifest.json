@@ -7,12 +7,20 @@
   "host_permissions": [
     "https://huggingface.co/*",
     "https://*.huggingface.co/*",
-    "https://*.hf.co/*"
+    "https://*.hf.co/*",
+    "https://api.anthropic.com/*"
   ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
   "action": {
     "default_title": "Tend",
     "default_popup": "popup.html"

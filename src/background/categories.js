@@ -25,14 +25,16 @@ const CATEGORY_RULES = [
   ['Finance', /paypal\.com|chase\.com|wellsfargo|stripe\.com|coinbase|robinhood/],
   ['Languages', /translate|dictionary|duolingo|talktomeinkorean|linguee|deepl\.com/],
   ['Account sign-in', /sign[\s-]?in|\blogin\b|accounts\.google|\bid\.\w+\.\w+\b|\boauth\b/],
-  ['Design & creative', /figma\.com|adobe\.com|dribbble|behance\.net|canva\.com/],
+  ['Design & creative', /figma\.com|adobe\.com|dribbble|behance\.net|canva\.com|\btypefaces?\b|\bfonts?\b|typography|\bicons?\b|\bmockups?\b|\bwireframes?\b|\billustrations?\b|color\s*palette/],
   ['Maps & navigation', /maps\.google|openstreetmap|waze\.com/],
 ];
 
 function bestCategory(tab) {
   let host = '';
   try { host = new URL(tab.url).hostname.toLowerCase(); } catch {}
-  const text = `${host} ${(tab.title || '').toLowerCase()}`;
+  // The description (from content.js, when available) often says what a
+  // page is *for* when the title and host don't — see tend#1.
+  const text = `${host} ${(tab.title || '').toLowerCase()} ${(tab.description || '').toLowerCase()}`;
   for (const [name, pattern] of CATEGORY_RULES) {
     if (pattern && pattern.test(text)) return name;
   }
