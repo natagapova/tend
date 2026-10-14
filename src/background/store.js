@@ -11,6 +11,7 @@ export const KEYS = {
   decisions: 'decisions',       // DecisionRecord[]
   descriptions: 'descriptions', // { [tabId]: string } — from content.js, cleared on navigation
   anthropicApiKey: 'anthropicApiKey', // string, set by the user in the popup
+  theme: 'theme', // 'system' | 'light' | 'dark'
 };
 
 let queue = Promise.resolve();

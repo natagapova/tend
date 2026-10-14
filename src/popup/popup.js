@@ -8,6 +8,36 @@ const summary = document.getElementById('summary');
 const clusterTpl = document.getElementById('cluster-tpl');
 const tabTpl = document.getElementById('tab-tpl');
 
+// --- Theme ---
+//
+// Applied as early as possible (before the cluster list renders) to avoid a
+// flash of the wrong theme. "system" means no override — the CSS already
+// follows prefers-color-scheme on its own.
+
+const THEMES = ['system', 'light', 'dark'];
+const themeButtons = document.querySelectorAll('.theme-option');
+
+function applyTheme(theme) {
+  if (theme === 'light' || theme === 'dark') {
+    document.documentElement.dataset.theme = theme;
+  } else {
+    delete document.documentElement.dataset.theme;
+  }
+  for (const btn of themeButtons) {
+    btn.setAttribute('aria-pressed', String(btn.dataset.themeValue === (theme || 'system')));
+  }
+}
+
+chrome.storage.local.get(KEYS.theme).then((result) => applyTheme(result[KEYS.theme] ?? 'system'));
+
+for (const btn of themeButtons) {
+  btn.addEventListener('click', () => {
+    const theme = THEMES.includes(btn.dataset.themeValue) ? btn.dataset.themeValue : 'system';
+    applyTheme(theme);
+    chrome.storage.local.set({ [KEYS.theme]: theme });
+  });
+}
+
 // --- AI grouping settings (Anthropic API key) ---
 
 const settingsToggle = document.getElementById('settings-toggle');

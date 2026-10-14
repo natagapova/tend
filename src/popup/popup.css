@@ -29,6 +29,21 @@
   }
 }
 
+/* Explicit override from the theme picker — wins regardless of OS setting. */
+:root[data-theme="dark"] {
+  --bg: #0f1012;
+  --card: #1a1b1e;
+  --fg: #ededf0;
+  --muted: #9a9ea5;
+  --faint: #6a6e75;
+  --line: #2a2c30;
+  --accent: #a48fff;
+  --accent-track: #2c2740;
+  --close: #ff6b6b;
+  --close-hover-bg: #3a1f22;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
 * { box-sizing: border-box; }
 
 body {
@@ -103,6 +118,17 @@ h1 {
 }
 .settings-row button:hover { border-color: var(--accent); color: var(--accent); }
 .settings-note { font-size: 11px; color: var(--faint); margin: 6px 0 0; }
+
+.settings-section-label { display: block; margin-top: 14px; }
+
+.theme-row { gap: 4px; }
+.theme-option { flex: 1; }
+.theme-option[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--card);
+}
+.theme-option[aria-pressed="true"]:hover { color: var(--card); }
 
 main { padding: 0 10px 12px; }
 

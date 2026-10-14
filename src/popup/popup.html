@@ -9,7 +9,7 @@
     <header>
       <h1>Tend</h1>
       <span id="summary"></span>
-      <button id="settings-toggle" type="button" aria-label="AI grouping settings" title="AI grouping settings">
+      <button id="settings-toggle" type="button" aria-label="Settings" title="Settings">
         <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
           <circle cx="8" cy="8" r="2.2" fill="none" stroke="currentColor" stroke-width="1.3" />
           <path
@@ -19,7 +19,14 @@
       </button>
     </header>
     <section id="settings-panel" class="settings-panel" hidden>
-      <label for="api-key-input">Anthropic API key (optional)</label>
+      <label id="theme-label">Theme</label>
+      <div class="settings-row theme-row" role="radiogroup" aria-labelledby="theme-label">
+        <button class="theme-option" type="button" data-theme-value="system">System</button>
+        <button class="theme-option" type="button" data-theme-value="light">Light</button>
+        <button class="theme-option" type="button" data-theme-value="dark">Dark</button>
+      </div>
+
+      <label for="api-key-input" class="settings-section-label">Anthropic API key (optional)</label>
       <div class="settings-row">
         <input id="api-key-input" type="password" placeholder="sk-ant-…" autocomplete="off" />
         <button id="api-key-save" type="button">Save</button>
