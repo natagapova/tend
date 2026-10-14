@@ -53,7 +53,14 @@ export function cluster(ids, vectors, threshold = THRESHOLD) {
 }
 
 const STOPWORDS = new Set(
-  'the a an and or of to in on for with at by from is are be how what your you my new tab page home www com org net html'.split(' '),
+  (
+    // Function words.
+    'the a an and or of to in on for with at by from is are be how what your you my tab page home www com org net html '
+    // Generic marketing/filler words: shared across unrelated titles often
+    // enough to look like a real topic match (e.g. "Free Faces" + "170,000
+    // Free Fonts" sharing only "free"), without describing anything.
+    + 'free best top new download now online official easy simple get make app site'
+  ).split(' '),
 );
 
 /**
